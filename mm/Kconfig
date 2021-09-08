@@ -858,8 +858,6 @@ config GUP_BENCHMARK
 config ARCH_HAS_PTE_SPECIAL
 	bool
 
-endmenu
-
 config PROCESS_RECLAIM
 	bool "Enable process reclaim"
 	depends on PROC_FS
@@ -885,3 +883,7 @@ config FORCE_ALLOC_FROM_DMA_ZONE
 	  always using ZONE_DMA32 memory.
 
 	  If unsure, say "n".
+
+source "mm/damon/Kconfig"
+
+endmenu
