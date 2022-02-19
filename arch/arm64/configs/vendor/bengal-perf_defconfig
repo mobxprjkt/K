@@ -20,6 +20,9 @@ CONFIG_DEFAULT_TCP_CONG="westwood"
 # Enable "TTL" target support
 CONFIG_IP_NF_TARGET_TTL=y
 
+# Enable UTS Namespace
+CONFIG_UTS_NS=y
+
 # Enable block device writeback throttling
 CONFIG_BLK_WBT=y
 CONFIG_BLK_WBT_SQ=y
