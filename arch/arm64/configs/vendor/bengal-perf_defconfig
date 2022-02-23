@@ -20,6 +20,10 @@ CONFIG_DEFAULT_TCP_CONG="westwood"
 # Enable "TTL" target support
 CONFIG_IP_NF_TARGET_TTL=y
 
+# Enable block device writeback throttling
+CONFIG_BLK_WBT=y
+CONFIG_BLK_WBT_SQ=y
+
 # Enable NAT, PEDIT and CSUM classifier Actions
 CONFIG_NET_ACT_NAT=y
 CONFIG_NET_ACT_PEDIT=y
