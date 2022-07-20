@@ -1572,7 +1572,6 @@ static int __dwc3_gadget_kick_transfer(struct dwc3_ep *dep)
 			return ret;
 		}
 
-		dbg_event(0xFF, "GADGET_EP_CMD Failure", ret);
 		dwc3_stop_active_transfer(dwc, dep->number, true);
 
 		list_for_each_entry_safe(req, n, &dep->started_list, list)
@@ -1679,9 +1678,7 @@ static int __dwc3_gadget_ep_queue(struct dwc3_ep *dep, struct dwc3_request *req)
 		}
 	}
 
-	__dwc3_gadget_kick_transfer(dep);
-
-	return 0;
+	return __dwc3_gadget_kick_transfer(dep);
 }
 
 static int dwc3_gadget_wakeup(struct usb_gadget *g)
@@ -3096,6 +3093,11 @@ static int dwc3_gadget_ep_cleanup_completed_request(struct dwc3_ep *dep,
 		ret = dwc3_gadget_ep_reclaim_trb_linear(dep, req, event,
 				status);
 
+	req->request.actual = req->request.length - req->remaining;
+
+	if (!dwc3_gadget_ep_request_completed(req))
+		goto out;
+
 	if (req->needs_extra_trb) {
 		unsigned int maxp = usb_endpoint_maxp(dep->endpoint.desc);
 
@@ -3109,13 +3111,6 @@ static int dwc3_gadget_ep_cleanup_completed_request(struct dwc3_ep *dep,
 			ret = dwc3_gadget_ep_reclaim_trb_linear(dep, req, event, status);
 
 		req->needs_extra_trb = false;
-	}
-
-	req->request.actual = req->request.length - req->remaining;
-
-	if (!dwc3_gadget_ep_request_completed(req)) {
-		__dwc3_gadget_kick_transfer(dep);
-		goto out;
 	}
 
 	dwc3_gadget_giveback(dep, req, status);
@@ -3138,6 +3133,24 @@ static void dwc3_gadget_ep_cleanup_completed_requests(struct dwc3_ep *dep,
 		if (ret)
 			break;
 	}
+}
+
+static bool dwc3_gadget_ep_should_continue(struct dwc3_ep *dep)
+{
+	struct dwc3_request	*req;
+
+	if (!list_empty(&dep->pending_list))
+		return true;
+
+	/*
+	 * We only need to check the first entry of the started list. We can
+	 * assume the completed requests are removed from the started list.
+	 */
+	req = next_request(&dep->started_list);
+	if (!req)
+		return false;
+
+	return !dwc3_gadget_ep_request_completed(req);
 }
 
 static void dwc3_gadget_endpoint_frame_from_event(struct dwc3_ep *dep,
