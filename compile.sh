@@ -11,8 +11,25 @@ GCC64_DIR="$HOME/tc/gcc64"
 AK3_DIR="$HOME/android/AnyKernel3"
 DEFCONFIG="vendor/bengal-perf_defconfig"
 
+mkdir -p /tmp/output
+
+env() {
 export TELEGRAM_BOT_TOKEN=""
 export TELEGRAM_CHAT_ID=""
+
+TRIGGER_SHA="$(git rev-parse HEAD)"
+LATEST_COMMIT="$(git log --pretty=format:'%s' -1)"
+COMMIT_BY="$(git log --pretty=format:'by %an' -1)"
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+KERNEL_VERSION=$(cat out/.config | grep Linux/arm64 | cut -d " " -f3)
+
+export FILE_CAPTION="
+EXPERIMENTAL!!!!!!!!!!!!
+🏚️ Linux version: $KERNEL_VERSION
+🌿 Branch: $BRANCH
+🎁 Top commit: $LATEST_COMMIT
+👩‍💻 Commit author: $COMMIT_BY"
+}
 
 export PATH="${TC_DIR}/compiler/bin:${GCC64_DIR}/bin:${GCC_DIR}/bin:/usr/bin:${PATH}"
 
@@ -57,7 +74,9 @@ mkdir -p out
 make O=out ARCH=arm64 $DEFCONFIG
 
 echo -e "\nStarting compilation...\n"
-make -j$(nproc --all) O=out ARCH=arm64 LD_LIBRARY_PATH="${TC_DIR}/lib:${LD_LIBRARY_PATH}" CC=clang LD=ld.lld AR=llvm-ar AS=llvm-as NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- Image
+make -j$(nproc --all) O=out ARCH=arm64 LD_LIBRARY_PATH="${TC_DIR}/lib:${LD_LIBRARY_PATH}" CC=clang LD=ld.lld AR=llvm-ar AS=llvm-as NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi- CLANG_TRIPLE=aarch64-linux-gnu- Image dtb.img dtbo.img
+
+env
 
 if [ -f "out/arch/arm64/boot/Image" ]; then
 echo -e "\nKernel compiled succesfully! Zipping up...\n"
@@ -68,6 +87,8 @@ echo -e "\nAnyKernel3 repo not found locally and cloning failed! Aborting..."
 exit 1
 fi
 cp out/arch/arm64/boot/Image AnyKernel3
+cp out/arch/arm64/boot/dtb.img AnyKernel3
+cp out/arch/arm64/boot/dtbo.img AnyKernel3
 rm -f *zip
 cd AnyKernel3
 git checkout master &> /dev/null
