@@ -1,5 +1,9 @@
 CONFIG_LOCALVERSION="-SunriseKernel-v1.0"
 
+# Set westwood as TCP congestion algorithm
+CONFIG_TCP_CONG_WESTWOOD=y
+CONFIG_DEFAULT_WESTWOOD=y
+
 # CONFIG_LOCALVERSION_AUTO is not set
 CONFIG_AUDIT=y
 # CONFIG_AUDITSYSCALL is not set
