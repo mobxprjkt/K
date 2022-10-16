@@ -140,3 +140,4 @@ kernel/configs/android-*.cfg
 # Folder out,zips
 out/
 *.zip
+compile.sh
