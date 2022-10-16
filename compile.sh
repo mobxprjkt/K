@@ -15,7 +15,7 @@ DEFCONFIG="vendor/bengal-perf_defconfig"
 mkdir -p /tmp/output
 
 env() {
-export TELEGRAM_BOT_TOKEN="5734676652:AAEDQCdp40CU_ekrFzKkKa7h0H4eiYV2SLk"
+export TELEGRAM_BOT_TOKEN=""
 export TELEGRAM_CHAT_ID="@SunriseCI"
 
 TRIGGER_SHA="$(git rev-parse HEAD)"
