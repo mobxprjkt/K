@@ -4,7 +4,7 @@
 # Copyright (C) 2020-2021 Adithya R.
 
 SECONDS=0 # builtin bash timer
-ZIPNAME="/tmp/output/NotFoundName?-juice_$(date +%Y%m%d-%H%M).zip"
+ZIPNAME="/tmp/output/SunriseTestAdreno-juice_$(date +%Y%m%d-%H%M).zip"
 TC_DIR="$HOME/tc/sdclang"
 GCC_DIR="$HOME/tc/gcc"
 GCC64_DIR="$HOME/tc/gcc64"
@@ -15,15 +15,14 @@ DEFCONFIG="vendor/bengal-perf_defconfig"
 mkdir -p /tmp/output
 
 env() {
-export TELEGRAM_BOT_TOKEN=""
+export TELEGRAM_BOT_TOKEN="5734676652:AAEDQCdp40CU_ekrFzKkKa7h0H4eiYV2SLk"
 export TELEGRAM_CHAT_ID="@SunriseCI"
 
 TRIGGER_SHA="$(git rev-parse HEAD)"
 LATEST_COMMIT="$(git log --pretty=format:'%s' -1)"
 COMMIT_BY="$(git log --pretty=format:'by %an' -1)"
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-KERNEL_VERSION=$(cat out/.config | grep Linux/arm64 | cut -d " " -f3)
-
+KERNEL_VERSION="$(cat out/.config | grep Linux/arm64 | cut -d " " -f3)"
 export FILE_CAPTION="
 🏚️ Linux version: $KERNEL_VERSION
 🌿 Branch: $BRANCH
@@ -85,7 +84,7 @@ mkdir -p out
 make O=out ARCH=arm64 $DEFCONFIG
 
 echo -e "\nStarting compilation...\n"
-make -j$(nproc --all) O=out ARCH=arm64 \
+make -j16 O=out ARCH=arm64 \
     LD_LIBRARY_PATH="${TC_DIR}/lib:${LD_LIBRARY_PATH}" \
     CC=clang \
     LD=ld.lld \
@@ -110,7 +109,6 @@ echo -e "\nAnyKernel3 repo not found locally and cloning failed! Aborting..."
 exit 1
 fi
 cp out/arch/arm64/boot/Image AnyKernel3
-#cp out/arch/arm64/boot/dtb.img AnyKernel3
 cp out/arch/arm64/boot/dtbo.img AnyKernel3
 rm -f *zip
 cd AnyKernel3
