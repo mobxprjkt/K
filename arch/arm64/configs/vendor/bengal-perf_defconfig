@@ -1,4 +1,4 @@
-CONFIG_LOCALVERSION="-SunriseKernel-v1.0"
+CONFIG_LOCALVERSION="-AhegaoKernel-v1.0"
 
 # Set westwood as TCP congestion algorithm
 CONFIG_TCP_CONG_ADVANCED=y
